@@ -58,17 +58,17 @@ const getItem = options => {
 
     const item = cache[href] || Item(href); // eslint-disable-line no-use-before-define
 
-    if (isNum(options.time)) {
-        item.time = options.time;
-    }
-    if (isNum(options.size)) {
-        item.size = options.size;
-    }
     if (options.managed) {
         item.isManaged = true;
     }
     if (options.fetched) {
         item.isContentFetched = true;
+    }
+    if (options.thumbSquare) {
+        item.thumbSquare = options.thumbSquare;
+    }
+    if (options.thumbRational) {
+        item.thumbRational = options.thumbRational;
     }
 
     return item;

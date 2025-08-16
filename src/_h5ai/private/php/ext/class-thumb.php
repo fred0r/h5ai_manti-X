@@ -32,12 +32,8 @@ class Thumb {
     private $mtime;
     private $type;
     private $source_hash;
-    private $capture_data;
     private $thumb_path;
     private $thumb_href;
-    private $duration;
-    private $width;
-    private $height;
 
     public function __construct($context, $source_path, $type, $db) {
         $this->context = $context;

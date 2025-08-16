@@ -105,7 +105,6 @@ class Context {
     }
 
     public function is_hidden($name) {
-        // always hide
         if ($name === '.' || $name === '..') {
             return true;
         }
@@ -192,18 +191,20 @@ class Context {
         $cache = [];
         $folder = Item::get($this, $this->to_path($href), $cache);
 
-        // Add content of subfolders.
-        if ($what >= 2 && $folder !== null) {
+        if ($what >= 3 && $folder !== null) {
             foreach ($folder->get_content($cache) as $item) {
                 $item->get_content($cache);
             }
             $folder = $folder->get_parent($cache);
         }
 
-        // Add content of this folder and all parent folders.
-        while ($what >= 1 && $folder !== null) {
+        while ($what >= 2 && $folder !== null) {
             $folder->get_content($cache);
             $folder = $folder->get_parent($cache);
+        }
+        
+        if ($what == 1 && $folder !== null) {
+            $folder->get_content($cache);
         }
 
         uasort($cache, ['Item', 'cmp']);
@@ -211,6 +212,8 @@ class Context {
         foreach ($cache as $p => $item) {
             $result[] = $item->to_json_object();
         }
+
+        include_once(__DIR__ . '/../ext/class-thumb.php');
         include_once(__DIR__ . '/../ext/class-cachedb.php');
 
         $db = new CacheDB($this->setup);
@@ -219,7 +222,6 @@ class Context {
         $supported_formats = ['png', 'jpg', 'jpeg', 'webp'];
 
         foreach ($result as &$item_obj) {
-            // Check if the item is a folder by looking for the 'managed' key.
             if (isset($item_obj['managed'])) {
                 $folder_path = $this->to_path($item_obj['href']);
                 $thumb_dir = $folder_path . '/_thumb';
@@ -268,17 +270,14 @@ class Context {
 
     public function get_l10n($iso_codes) {
         $results = [];
-
         foreach ($iso_codes as $iso_code) {
             if (!in_array($iso_code, Context::$L10N_ISO_CODES)) {
                 continue;
             }
-
             $file = $this->setup->get('CONF_PATH') . '/l10n/' . $iso_code . '.json';
             $results[$iso_code] = Json::load($file);
             $results[$iso_code]['isoCode'] = $iso_code;
         }
-
         return $results;
     }
 
@@ -286,15 +285,12 @@ class Context {
         $hrefs = [];
         $thumbs = [];
         $filetypes = [];
-
         $height = $this->options['thumbnails']['size'] ?? 240;
         $width = floor($height * (4 / 3));
-
         $db = new CacheDB($this->setup);
 
         foreach ($requests as $req) {
             if ($req['type'] === 'blocked') {
-                // FIXME the client is still free to choose what is blocked or not.
                 $hrefs[] = null;
                 $filetypes[] = null;
                 continue;
@@ -326,45 +322,34 @@ class Context {
         if (preg_match('@^(https?://|/)@i', $href)) {
             return $href;
         }
-
         return $this->setup->get('PUBLIC_HREF') . 'ext/' . $href;
     }
 
     private function get_fonts_html() {
         $fonts = $this->query_option('view.fonts', []);
         $fonts_mono = $this->query_option('view.fontsMono', []);
-
         $html = '<style class="x-head">';
-
         if (sizeof($fonts) > 0) {
             $html .= '#root,input,select{font-family:"' . implode('","', $fonts) . '"!important}';
         }
-
         if (sizeof($fonts_mono) > 0) {
             $html .= 'pre,code{font-family:"' . implode('","', $fonts_mono) . '"!important}';
         }
-
         $html .= '</style>';
-
         return $html;
     }
 
     public function get_x_head_html() {
         $scripts = $this->query_option('resources.scripts', []);
         $styles = $this->query_option('resources.styles', []);
-
         $html = '';
-
         foreach ($styles as $href) {
             $html .= '<link rel="stylesheet" href="' . $this->prefix_x_head_href($href) . '" class="x-head">';
         }
-
         foreach ($scripts as $href) {
             $html .= '<script src="' . $this->prefix_x_head_href($href) . '" class="x-head"></script>';
         }
-
         $html .= $this->get_fonts_html();
-
         return $html;
     }
 }
