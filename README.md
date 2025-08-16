@@ -14,7 +14,8 @@ A HTTP web server index for Apache httpd, lighttpd, and nginx.
 * Find a preprocessed package and detailed install instructions on the
   [project page][web].
 * For bug reports and feature requests please use [issues][github-issues].
-* Tested with **PHP 8.0.0+**
+* Requires at least **PHP 7.0.0+**
+* Tested with **PHP 8.4.0**
 
 
 ## Build
@@ -22,13 +23,23 @@ A HTTP web server index for Apache httpd, lighttpd, and nginx.
 There are installation ready packages for the latest [releases][release] and
 [dev builds][develop]. But to build **h5ai** yourself either `git clone` or
 download the repository. From within the root folder run the following
-commands to find a fresh zipball in folder `build` (tested on linux only,
-requires [`node 10.0+`][node] to be installed, might work on other
-configurations).
+commands to find a fresh zipball in folder `build` (tested and requires
+[`node 10.0 - 11.5.2`][node] to work).
 
 ~~~sh
 > npm install
 > npm run build
+~~~
+Because of outdated packages, it might be necessary to use:
+<h4>Windows</h4>
+
+~~~sh
+> $env:NODE_OPTIONS = "--openssl-legacy-provider"; npm run build
+~~~
+<h4>Linux</h4>
+
+~~~sh
+> NODE_OPTIONS=--openssl-legacy-provider npm run build
 ~~~
 
 
