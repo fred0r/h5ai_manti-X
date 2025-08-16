@@ -29,7 +29,7 @@ commands to find a fresh zipball in folder `build` (tested and requires
 > npm install
 > npm run build
 ~~~
-Because of outdated packages, it might be necessary to use:
+Because of outdated `ghu`, it might be necessary to use:
 <h4>Windows</h4>
 
 ~~~sh
