@@ -211,7 +211,40 @@ class Context {
         foreach ($cache as $p => $item) {
             $result[] = $item->to_json_object();
         }
+        include_once(__DIR__ . '/../ext/class-cachedb.php');
 
+        $db = new CacheDB($this->setup);
+        $height = $this->options['thumbnails']['size'] ?? 240;
+        $width = floor($height * (4 / 3));
+        $supported_formats = ['png', 'jpg', 'jpeg', 'webp'];
+
+        foreach ($result as &$item_obj) {
+            // Check if the item is a folder by looking for the 'managed' key.
+            if (isset($item_obj['managed'])) {
+                $folder_path = $this->to_path($item_obj['href']);
+                $thumb_dir = $folder_path . '/_thumb';
+
+                if (is_dir($thumb_dir)) {
+                    $files = @scandir($thumb_dir);
+                    if ($files) {
+                        foreach ($files as $file) {
+                            $extension = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+                            if (in_array($extension, $supported_formats)) {
+                                $image_source_path = $thumb_dir . '/' . $file;
+                                $thumb_gen = new Thumb($this, $image_source_path, 'img', $db);
+                                $thumb_href = $thumb_gen->thumb($width, $height);
+
+                                if ($thumb_href) {
+                                    $item_obj['thumbSquare'] = $thumb_href;
+                                    $item_obj['thumbRational'] = $thumb_href;
+                                }
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
         return $result;
     }
 
@@ -270,7 +303,7 @@ class Context {
             if (!array_key_exists($path, $thumbs)) {
                 $thumbs[$path] = new Thumb($this, $path, $req['type'], $db);
             }
-            else if ($thumbs[$path]->type->name === 'file') {
+            else if ($thumbs[$path]->get_type()->name === 'file') {
                 // File has already been mime tested and cannot have a thumbnail
                 // Only applies if we request the same path again in the same request (security measure)
                 $hrefs[] = null;
@@ -280,8 +313,8 @@ class Context {
 
             $hrefs[] = $thumbs[$path]->thumb($width, $height);
 
-            if ($thumbs[$path]->type->was_wrong()) {
-                $filetypes[] = $thumbs[$path]->type->name;
+            if (method_exists($thumbs[$path], 'get_type') && $thumbs[$path]->get_type()->was_wrong()) {
+                $filetypes[] = $thumbs[$path]->get_type()->name;
             } else {
                 $filetypes[] = null; // No client-side update needed.
             }

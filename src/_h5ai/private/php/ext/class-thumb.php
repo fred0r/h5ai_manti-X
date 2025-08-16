@@ -5,14 +5,14 @@ class Thumb {
     const FFPROBE_CMDV = ['ffprobe', '-v', 'warning', '-show_entries', 'format=duration', '-of', 'default=noprint_wrappers=1:nokey=1', '[H5AI_SRC]'];
     const AVCONV_CMDV = ['avconv', '-v', 'warning', '-nostdin', '-y', '-hide_banner', '-ss', '[H5AI_DUR]', '-i', '[H5AI_SRC]', '-an', '-vframes', '1', '-f', 'image2', '-'];
     const AVPROBE_CMDV = ['avprobe', '-v', 'warning', '-show_entries', 'format=duration', '-of', 'default=noprint_wrappers=1:nokey=1', '[H5AI_SRC]'];
-    const CONVERT_CMDV = ['convert', '-density', '200', '-quality', '100', '-strip', '[H5AI_SRC][0]', 'JPG:-'];
-    const GM_CONVERT_CMDV = ['gm', 'convert', '-density', '200', '-quality', '100', '-strip', '[H5AI_SRC][0]', 'JPG:-'];
+    const CONVERT_CMDV = ['convert', '-density', '200', '-quality', '100', '-strip', '[H5AI_SRC][0]', 'WEBP:-'];
+    const GM_CONVERT_CMDV = ['gm', 'convert', '-density', '200', '-quality', '100', '-strip', '[H5AI_SRC][0]', 'WEBP:-'];
     const THUMB_CACHE = 'thumbs';
     const IMG_EXT = ['jpg', 'jpe', 'jpeg', 'jp2', 'jpx', 'tiff', 'webp', 'ico', 'png', 'bmp', 'gif'];
 
     // 'file' has to be the last key tested during fallback logic.
     public const HANDLED_TYPES = array(
-        'img' => ['img', 'img-bmp', 'img-jpg', 'img-gif', 'img-png', 'img-raw', 'img-tiff', 'img-svg'],
+        'img' => ['img', 'img-bmp', 'img-jpg', 'img-gif', 'img-png', 'img-raw', 'img-tiff', 'img-svg', 'img-webp'],
         'mov' => ['vid-mp4', 'vid-webm', 'vid-rm', 'vid-mpg', 'vid-avi', 'vid-mkv', 'vid-mov'],
         'doc' => ['x-ps', 'x-pdf'],
         'swf' => ['vid-swf', 'vid-flv'],
@@ -28,6 +28,16 @@ class Thumb {
     private $image;
     private $attempt;
     private $db;
+    private $source_path;
+    private $mtime;
+    private $type;
+    private $source_hash;
+    private $capture_data;
+    private $thumb_path;
+    private $thumb_href;
+    private $duration;
+    private $width;
+    private $height;
 
     public function __construct($context, $source_path, $type, $db) {
         $this->context = $context;
@@ -36,7 +46,7 @@ class Thumb {
         $this->thumbs_path = $this->setup->get('CACHE_PUB_PATH') . '/' . self::THUMB_CACHE;
         $this->thumbs_href = $this->setup->get('CACHE_PUB_HREF') . self::THUMB_CACHE;
         $this->source_path = $source_path;
-        $this->mtime = filemtime($this->source_path);
+        $this->mtime = @filemtime($this->source_path);
         $this->type = new FileType($context, $type);
         $this->source_hash = sha1($source_path);
         $this->capture_data = false;
@@ -44,6 +54,9 @@ class Thumb {
         $this->thumb_href = null;
         $this->image = null;
         $this->attempt = 0;
+        $this->duration = null;
+        $this->width = 0;
+        $this->height = 0;
 
         if (!is_dir($this->thumbs_path)) {
             @mkdir($this->thumbs_path, 0755, true);
@@ -56,13 +69,58 @@ class Thumb {
         }
     }
 
+    public function get_type() {
+        return $this->type ?? null; // Assuming $type is a property of the class.
+    }
+    
+    // Check /_thumb/, if present, for a custom thumbnail for the current folder.
+    private function check_custom_thumb($source_path) {
+    $supported_formats = ['png', 'jpg', 'jpeg', 'webp', 'gif'];
+
+    if (is_dir($source_path)) {
+        $thumb_dir = $source_path . '/_thumb';
+        if (is_dir($thumb_dir)) {
+            $files = @scandir($thumb_dir);
+            if ($files) {
+                foreach ($files as $file) {
+                    $extension = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+                    if (in_array($extension, $supported_formats)) {
+                        return $thumb_dir . '/' . $file; // Return the path of the first valid image
+                    }
+                }
+            }
+        }
+    } else {
+        $fileparts = pathinfo($source_path);
+        foreach ($supported_formats as $format) {
+            $custom_path = $fileparts['dirname'] . '/_thumb/' . $fileparts['filename'] . '.' . $format;
+            if (file_exists($custom_path)) {
+                return $custom_path;
+            }
+        }
+    }
+    return null;
+}
+
     public function thumb($width, $height) {
         if (!file_exists($this->source_path)
             || Util::starts_with($this->source_path,
                 $this->setup->get('CACHE_PUB_PATH'))) {
             return null;
         }
-        $name = 'thumb-' . $this->source_hash . '-' . $width . 'x' . $height . '.jpg';
+
+        $is_directory = is_dir($this->source_path);
+        $custom_thumb_source_path = $this->check_custom_thumb($this->source_path);
+
+        if ($custom_thumb_source_path) {
+            $this->source_path = $custom_thumb_source_path;
+            $this->mtime = @filemtime($this->source_path);
+            $this->source_hash = sha1($this->source_path);
+            $this->type = new FileType($this->context, 'img');
+        } else if ($is_directory) {
+            return null;
+        }
+        $name = 'thumb-' . $this->source_hash . '-' . $width . 'x' . $height . '.webp';
         $this->thumb_path = $this->thumbs_path . '/' . $name;
         $this->thumb_href = $this->thumbs_href . '/' . $name;
 
@@ -120,9 +178,9 @@ class Thumb {
             return null;
         }
         $this->image->thumb($width, $height);
-        $this->image->save_dest_jpeg($this->thumb_path, 80);
+        $this->image->save_dest_webp($this->thumb_path, 80);
 
-        if (file_exists($this->thumb_path)) {
+        if (!is_null($this->thumb_path) && file_exists($this->thumb_path)) {
             // Cache it for further requests
             return $this->thumb_href;
         }
@@ -415,16 +473,17 @@ class Thumb {
         $output = null;
         $error = null;
         $exit = Util::proc_open_cmdv($cmdv, $output, $error);
-        if (empty($output) || !is_numeric($output) || is_infinite($output)) {
+        if (empty($output) || !is_numeric($output) || is_infinite((float)$output)) {
             if (!empty($error) && strpos($error, 'misdetection possible') !== false) {
                 throw new Exception($error);
             }
             return '0.1';
         }
         // Seek at user-defined percentage of the total video duration
+        $duration = floatval($output); // Assign the output value to $duration
         return strval(
             round(
-            (floatval($duration) *
+            ($duration *
             floatval($this->context->query_option('thumbnails.seek', 50)) / 100),
             1, PHP_ROUND_HALF_UP)
         );
@@ -510,9 +569,9 @@ class Image {
         return true;
     }
 
-    public function save_dest_jpeg($filename, $quality = 80) {
+    public function save_dest_webp($filename, $quality = 80) {
         if (!is_null($this->dest)) {
-            @imagejpeg($this->dest, $filename, $quality);
+            @imagewebp($this->dest, $filename, $quality);
             @chmod($filename, 0775);
         }
     }

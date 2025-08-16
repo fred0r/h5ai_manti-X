@@ -6,6 +6,7 @@ class CacheDB {
     private $conn;
     private $sel_stmt;
     private $ins_stmt;
+    private $version;
 
     public function __construct($setup) {
         $this->setup = $setup;

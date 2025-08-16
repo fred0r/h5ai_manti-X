@@ -2,7 +2,7 @@
 
 [![license][license-img]][github] [![web][web-img]][web] [![github][github-img]][github]
 
-A modern HTTP web server index for Apache httpd, lighttpd, and nginx.
+A HTTP web server index for Apache httpd, lighttpd, and nginx.
 
 **This is a fork of [lrsjng's h5ai](https://github.com/lrsjng/h5ai), which appears to be no longer maintained.**
 
@@ -14,6 +14,7 @@ A modern HTTP web server index for Apache httpd, lighttpd, and nginx.
 * Find a preprocessed package and detailed install instructions on the
   [project page][web].
 * For bug reports and feature requests please use [issues][github-issues].
+* Tested with **PHP 8.0.0+**
 
 
 ## Build
@@ -74,11 +75,10 @@ THE SOFTWARE.
 too. Exceptions are some [Material Design icons][material-design-icons] (CC BY 4.0).
 
 
-[web]: https://larsjung.de/h5ai/
-[github]: https://github.com/lrsjng/h5ai
-[github-issues]: https://github.com/lrsjng/h5ai/issues
-[release]: https://release.larsjung.de/h5ai/
-[develop]: https://release.larsjung.de/h5ai/develop/
+[original]: https://github.com/lrsjng/h5ai
+[github]: https://github.com/manti-X/h5ai/
+[github-issues]: https://github.com/manti-X/h5ai/issues
+[release]: https://github.com/manti-X/h5ai/releases
 [node]: https://nodejs.org
 [material-design-icons]: https://github.com/google/material-design-icons
 

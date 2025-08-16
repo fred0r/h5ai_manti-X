@@ -50,6 +50,7 @@
     "txt-tex":          { "glob": ["*.tex"] },
     "txt-vcal":         { "glob": ["*.vcal"] },
     "txt-xml":          { "glob": ["*.xml"] },
+    "txt-webp":         { "glob": ["*.webp"] },
     "vid":              { "glob": [] },
     "vid-avi":          { "glob": ["*.avi"], "mime": ["x-msvideo"] },
     "vid-flv":          { "glob": ["*.flv"], "mime": ["x-flv"] },

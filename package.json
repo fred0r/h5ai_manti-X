@@ -1,13 +1,13 @@
 {
   "name": "h5ai",
-  "version": "0.31.0",
-  "description": "Modern HTTP web server index.",
-  "homepage": "https://larsjung.de/h5ai/",
-  "author": "Lars Jung <lrsjng@gmail.com> (https://larsjung.de)",
+  "version": "0.32.0",
+  "description": "HTTP web server index.",
+  "homepage": "https://github.com/manti-X/h5ai/",
+  "author": "manti-X",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/lrsjng/h5ai.git"
+    "url": "https://github.com/manti-X/h5ai.git"
   },
   "scripts": {
     "lint": "eslint .",
