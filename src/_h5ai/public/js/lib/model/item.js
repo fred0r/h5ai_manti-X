@@ -64,7 +64,6 @@ const getItem = options => {
     if (isNum(options.size)) {
         item.size = options.size;
     }
-
     if (options.managed) {
         item.isManaged = true;
     }
