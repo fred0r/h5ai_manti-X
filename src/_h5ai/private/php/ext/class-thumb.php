@@ -71,7 +71,7 @@ class Thumb {
     
     // Check /_thumb/, if present, for a custom thumbnail for the current folder.
     private function check_custom_thumb($source_path) {
-    $supported_formats = ['png', 'jpg', 'jpeg', 'webp', 'gif'];
+    $supported_formats = ['png', 'jpg', 'jpeg', 'webp'];
 
     if (is_dir($source_path)) {
         $thumb_dir = $source_path . '/_thumb';

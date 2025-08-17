@@ -23,16 +23,16 @@ const loginTpl =
             </div>
         </div>`;
 const supportTpl =
-        `<div id="support">
-            Show your support with a donation!
-            <div class="paypal">
-                <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
-                    <input type="hidden" name="cmd" value="_s-xclick"/>
-                    <input type="hidden" name="hosted_button_id" value="8WSPKWT7YBTSQ"/>
-                    <input type="image" src="${resource.image('paypal')}" name="submit" alt="PayPal"/>
-                </form>
-            </div>
-        </div>`;
+    `<div id="support">
+        Show your support with a donation!
+        <div class="kofi">
+            <a href="https://ko-fi.com/bakaloli" target="_blank">
+                <img src="https://storage.ko-fi.com/cdn/kofi5.png" 
+                     alt="Buy me a coffee at ko-fi.com" 
+                     style="width:180px; height:auto;"/>
+            </a>
+        </div>
+    </div>`;
 const setup = config.setup;
 
 
