@@ -1,29 +1,27 @@
 # h5ai
 
-[![license][license-img]][github] [![web][web-img]][web] [![github][github-img]][github]
+[![license][license-img]][github] [![Donate][kofi-img]][kofi]
 
-A modern HTTP web server index for Apache httpd, lighttpd, and nginx.
+A HTTP web server index for Apache httpd, lighttpd, and nginx.
 
-**This is a fork of [lrsjng's h5ai](https://github.com/lrsjng/h5ai), which appears to be no longer maintained.**
+**This is a fork of [lrsjng's h5ai][original], which appears to be no longer maintained.**
 
 
 ## Important
 
 * Do **not** install any files from the `src` folder, they need to be
   preprocessed to work correctly!
-* Find a preprocessed package and detailed install instructions on the
-  [project page][web].
+* Find detailed install instructions on the old [project page][old-project-page].
 * For bug reports and feature requests please use [issues][github-issues].
+* Requires at least **PHP 7.0.0+**
+* Tested with **PHP 8.4.0** and **nginx**
 
 
 ## Build
 
-There are installation ready packages for the latest [releases][release] and
-[dev builds][develop]. But to build **h5ai** yourself either `git clone` or
+There are installation ready packages for the latest [releases][release]. But to build **h5ai** yourself either `git clone` or
 download the repository. From within the root folder run the following
-commands to find a fresh zipball in folder `build` (tested on linux only,
-requires [`node 10.0+`][node] to be installed, might work on other
-configurations).
+commands to find a fresh zipball in folder `build`. Requires **[`node 18.18.0`][node]** or **higher** to work.
 
 ~~~sh
 > npm install
@@ -38,10 +36,11 @@ configurations).
 * PHP FileInfo module
 * PHP Sqlite3 module
 * PHP Zip module
-* PHP [Rar](https://pecl.php.net/package/rar) module
+* PHP [Rar][RAR-Module] module
 * du
 * tar
 * zip
+
 
 ## License
 
@@ -74,14 +73,17 @@ THE SOFTWARE.
 too. Exceptions are some [Material Design icons][material-design-icons] (CC BY 4.0).
 
 
-[web]: https://larsjung.de/h5ai/
-[github]: https://github.com/lrsjng/h5ai
-[github-issues]: https://github.com/lrsjng/h5ai/issues
-[release]: https://release.larsjung.de/h5ai/
-[develop]: https://release.larsjung.de/h5ai/develop/
+[original]: https://github.com/lrsjng/h5ai
+[github]: https://github.com/manti-X/h5ai/
+[github-issues]: https://github.com/manti-X/h5ai/issues
+[release]: https://github.com/manti-X/h5ai/releases
 [node]: https://nodejs.org
 [material-design-icons]: https://github.com/google/material-design-icons
+[old-project-page]: https://web.archive.org/web/20240120005545/https://larsjung.de/h5ai/
+[RAR-Module]: https://pecl.php.net/package/rar
+[kofi]: https://ko-fi.com/bakaloli
 
 [license-img]: https://img.shields.io/badge/license-MIT-a0a060.svg?style=flat-square
 [web-img]: https://img.shields.io/badge/web-larsjung.de/h5ai-a0a060.svg?style=flat-square
 [github-img]: https://img.shields.io/badge/github-lrsjng/h5ai-a0a060.svg?style=flat-square
+[kofi-img]: https://img.shields.io/badge/Ko--fi-FF5E5B?logo=ko-fi&logoColor=white

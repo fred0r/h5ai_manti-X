@@ -5,7 +5,7 @@ const allsettings = require('../core/settings');
 
 const defaults = {
     enabled: false,
-    img: ['img-bmp', 'img-gif', 'img-ico', 'img-jpg', 'img-png', 'img-svg', 'img-tiff'],
+    img: ['img-bmp', 'img-gif', 'img-ico', 'img-jpg', 'img-png', 'img-svg', 'img-tiff', 'img-webp'],
     mov: ['vid-avi', 'vid-mkv', 'vid-flv', 'vid-swf', 'vid-mov', 'vid-mp4', 'vid-mpg', 'vid-webm', 'vid-wmv', 'vid-ts'],
     doc: ['x-pdf', 'x-ps'],
     ar: ['ar-zip', 'ar-rar'],
@@ -21,6 +21,11 @@ settings.blocklist = settings.blocklist.concat(
     difference(default_types, current_settings));
 
 const queueItem = (queue, item) => {
+    if (item.thumbRational) {
+        item.$view.find('.icon img').addCls('thumb').attr('src', item.thumbRational);
+        return;
+    }
+
     let type = null;
 
     if (includes(settings.blocklist, item.type)) {
@@ -28,32 +33,28 @@ const queueItem = (queue, item) => {
     } else if (includes(current_settings, item.type)) {
         type = item.type;
     } else if (item.type === 'folder') {
-        return;
+        type = 'folder';
     } else {
-        type = 'file'
+        type = 'file';
     }
 
-    if (item.thumbRational) {
-        item.$view.find('.icon img').addCls('thumb').attr('src', item.thumbRational);
-    } else {
-        queue.push({
-            type,
-            href: item.absHref,
-            callback: src => {
-                if (src && item.$view) {
-                    item.thumbRational = src;
-                    item.$view.find('.icon img').addCls('thumb').attr('src', src);
-                }
-            },
-            callback_type: filetype => {
-                if (filetype && item.$view) {
-                    console.log(`Updated type for ${item.label}: ${item.type}->${filetype}`);
-                    item.type = filetype;
-                    event.pub('item.changed', item);
-                }
+    queue.push({
+        type,
+        href: item.absHref,
+        callback: src => {
+            if (src && item.$view) {
+                item.thumbRational = src;
+                item.$view.find('.icon img').addCls('thumb').attr('src', src);
             }
-        });
-    }
+        },
+        callback_type: filetype => {
+            if (filetype && item.$view) {
+                console.log(`Updated type for ${item.label}: ${item.type}->${filetype}`);
+                item.type = filetype;
+                event.pub('item.changed', item);
+            }
+        }
+    });
 };
 
 const requestQueue = queue => {

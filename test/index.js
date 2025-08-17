@@ -1,6 +1,12 @@
 if (!global.window) {
-    const JSDOM = require('jsdom').JSDOM;
-    global.window = new JSDOM('').window;
+    const { JSDOM } = require('jsdom');
+    const dom = new JSDOM('<!DOCTYPE html><html><head></head><body></body></html>', {
+        url: 'http://localhost/'
+    });
+
+    global.window = dom.window;
+    global.document = dom.window.document;
+    global.navigator = dom.window.navigator;
 }
 
 const {test} = require('scar');
@@ -13,5 +19,3 @@ require('./tests/unit/util/naturalCmp');
 require('./tests/unit/util/parsePatten');
 
 pin_html();
-
-test.cli({sync: true});

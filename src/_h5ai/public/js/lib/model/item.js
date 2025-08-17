@@ -70,6 +70,12 @@ const getItem = options => {
     if (options.fetched) {
         item.isContentFetched = true;
     }
+    if (options.thumbSquare) {
+        item.thumbSquare = options.thumbSquare;
+    }
+    if (options.thumbRational) {
+        item.thumbRational = options.thumbRational;
+    }
 
     return item;
 };
